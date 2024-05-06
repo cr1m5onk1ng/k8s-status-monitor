@@ -1,0 +1,132 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'Services Monitor API'
+  license:
+    name: MIT
+servers:
+  - url: 'localhost:3000/monitor'
+tags:
+  - name: status
+    description: Operations about services status
+paths:
+  /monitor/status/internal:
+    get:
+      summary: 'Returns the status of all k8s microservices'
+      operationId: getStatusInternal
+      tags:
+        - status
+        - internal
+      responses:
+        '200':
+          description: 'Details about internal services status'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalMonitorActionResult'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'  
+  /monitor/status/external:
+    get:
+      summary: 'Returns the status of all external services'
+      operationId: getStatusExternal
+      tags:
+        - status
+        - external
+      responses:
+        '200':
+          description: 'Details about external services status'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalMonitorActionResult'
+  /monitor/restart/{deployment}:
+    post:
+      summary: 'Restarts a k8s deployment'
+      operationId: restartInternalService
+      tags:
+        - restart
+        - internal
+      parameters:
+        - name: 'deployment'
+          in: 'path'
+          description: 'Name of the deployment to restart'
+          required: true
+          type: string 
+      responses:
+        '204':
+          description: 'Deployment restarted successfully'
+components:
+  schemas:
+    DeploymentStatusResponse:
+      type: object
+      required:
+        - deploymentName
+        - deploymentState
+      properties:
+        deploymentName: 
+          type: string
+        deploymentState:
+          type: string
+          enum: [OK, KO, WARNING] 
+    InternalMonitorActionResult:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            serviceProbes: array
+            items:           
+              $ref: '#/components/schemas/DeploymentStatusResponse'
+    ExternalServiceStatusResponse:
+      type: object
+      properties:
+        serviceStatus:
+          type: string 
+          enum: [OK, KO] 
+        metadata:
+          type: object
+    ExternalMonitorActionResult:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            serviceProbes: array
+            items:           
+              $ref: '#/components/schemas/ExternalServiceStatusResponse'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+        - detail
+      properties:
+        code:
+            type: integer
+            enum: [400]
+        message:
+          type: string
+          enum: ['Bad request']
+        detail:
+          type: string
+          enum: ['Error details']
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+security:
+    - bearerAuth: []
