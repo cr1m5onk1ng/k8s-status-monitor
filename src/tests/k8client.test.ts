@@ -1,4 +1,5 @@
 import MonitorApiKubernetesClient from "../domain/repositories/status/k8sclientRepository";
+import { TEST_CLUSTER_ID, TEST_ZONE_ID, TEST_PROJECT_ID, TEST_DEPLOYMENT_ID } from "../config"
 
 const timeLimit = 20_000; // gcloud and k8s clients may take quite a long time to connect
 
@@ -7,9 +8,9 @@ let client: MonitorApiKubernetesClient;
 beforeAll(() => {
     client = MonitorApiKubernetesClient.get(
         {
-            clusterId: 'dev',
-            zoneId: 'europe-west4-a',
-            projectId: 'citypop-dev',
+            clusterId: TEST_CLUSTER_ID,
+            zoneId: TEST_ZONE_ID,
+            projectId: TEST_PROJECT_ID,
             namespace: 'default',
         },
     );
@@ -37,7 +38,7 @@ describe('Testing K8s client', () => {
     }, timeLimit);
 
     it('restarts deployment successfully', () => {
-        return expect(client.restartDeployment('pop-tribe-api')).resolves.not.toThrow();
+        return expect(client.restartDeployment(TEST_DEPLOYMENT_ID)).resolves.not.toThrow();
     }, timeLimit);
 });
 

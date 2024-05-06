@@ -1,4 +1,3 @@
-import { time } from "console";
 import App from "../app";
 import StatusRoute from "../routes/status.route";
 import request from "supertest";

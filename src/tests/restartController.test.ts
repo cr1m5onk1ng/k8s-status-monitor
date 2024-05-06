@@ -1,4 +1,5 @@
 import App from "../app";
+import { TEST_DEPLOYMENT_ID } from "../config";
 import RestartRoute from "../routes/restart.route";
 import request from "supertest";
 
@@ -30,7 +31,7 @@ describe('Testing restart service controller', () => {
     it('restarts a kubernetes deployment with status 204', async () => {
         const restartRoute = new RestartRoute();
         return request(app.getServer())
-            .post(`/monitor${restartRoute.path}/pop-tribe-api`)
+            .post(`/monitor${restartRoute.path}/${TEST_DEPLOYMENT_ID}`)
             .send()
             .set('Accept', 'application/json')
             .set('Authorization', 'Bearer ' + token)
